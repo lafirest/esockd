@@ -186,8 +186,10 @@ code_change(_OldVsn, StateName, State, _Extra) ->
 close(Sock) -> catch port_close(Sock).
 
 rate_limit(State = #state{conn_limiter = Limiter}) ->
+    io:format(">>> L1 :~p~n", [Limiter]),
     case esockd_generic_limiter:consume(1, Limiter) of
         {ok, Limiter2} ->
+            io:format(">>> L2 :~p~n", [Limiter2]),
             {keep_state,
              State#state{conn_limiter = Limiter2},
              {next_event, internal, accept}};
