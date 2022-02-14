@@ -85,6 +85,7 @@ init([Proto, ListenOn, ConnSup, TuneFun, UpgradeFuns, Limiter, LSock]) ->
 callback_mode() -> state_functions.
 
 accepting(internal, accept, State = #state{lsock = LSock}) ->
+    io:format(">>> accept:~p~n", [State#state.conn_limiter]),
     case prim_inet:async_accept(LSock, -1) of
         {ok, Ref} ->
             {keep_state, State#state{accept_ref = Ref}};
@@ -171,6 +172,7 @@ suspending({call, From}, {set_conn_limiter, Limiter}, State) ->
     {keep_state, State#state{conn_limiter = Limiter}, {reply, From, ok}};
 
 suspending(timeout, _Timeout, State) ->
+    io:format(">>> suspending limiter:~p~n", [State#state.conn_limiter]),
     {next_state, accepting, State, {next_event, internal, accept}}.
 
 terminate(_Reason, _StateName, _State) ->
